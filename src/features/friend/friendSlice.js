@@ -1,17 +1,18 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { toast } from "react-toastify";
-import apiService from "../../app/apiService";
+import { createSlice } from '@reduxjs/toolkit';
+import { toast } from 'react-toastify';
+import apiService from '../../app/apiService';
 
 const initialState = {
   isLoading: false,
   error: null,
   currentPageUsers: [],
   usersById: {},
+  totalUsers: 0,
   totalPages: 1,
 };
 
 const slice = createSlice({
-  name: "friend",
+  name: 'friend',
   initialState,
   reducers: {
     startLoading(state) {
@@ -76,22 +77,41 @@ const slice = createSlice({
       const { targetUserId, ...friendship } = action.payload;
       state.usersById[targetUserId].friendship = friendship;
     },
-
-    cancelRequestSuccess(state, action) {
-      state.isLoading = false;
-      state.error = null;
-      const { targetUserId } = action.payload;
-      state.usersById[targetUserId].friendship = null;
-    },
-
     removeFriendSuccess(state, action) {
       state.isLoading = false;
       state.error = null;
       const { targetUserId } = action.payload;
       state.usersById[targetUserId].friendship = null;
     },
+    getOutgoingRequestsSuccess(state, action) {
+      state.isLoading = false;
+      state.error = null;
+
+      const { users, count, totalPages } = action.payload;
+      users.forEach((user) => (state.usersById[user._id] = user));
+      state.currentPageUsers = users.map((user) => user._id);
+      state.totalUsers = count;
+      state.totalPages = totalPages;
+    },
+    cancelRequestSuccess(state, action) {
+      state.isLoading = false;
+      state.error = null;
+      const { targetUserId } = action.payload;
+      delete state.usersById[targetUserId];
+      state.currentPageUsers = state.currentPageUsers.filter(
+        (id) => id !== targetUserId
+      );
+      state.totalUsers -= 1;
+    },
   },
 });
+
+export const {
+  startLoading,
+  hasError,
+  getOutgoingRequestsSuccess,
+  cancelRequestSuccess,
+} = slice.actions;
 
 export default slice.reducer;
 
@@ -102,7 +122,7 @@ export const getUsers =
     try {
       const params = { page, limit };
       if (filterName) params.name = filterName;
-      const response = await apiService.get("/users", { params });
+      const response = await apiService.get('/users', { params });
       dispatch(slice.actions.getUsersSuccess(response.data));
     } catch (error) {
       dispatch(slice.actions.hasError(error));
@@ -117,7 +137,7 @@ export const getFriends =
     try {
       const params = { page, limit };
       if (filterName) params.name = filterName;
-      const response = await apiService.get("/friends", { params });
+      const response = await apiService.get('/friends', { params });
       dispatch(slice.actions.getFriendsSuccess(response.data));
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
@@ -132,7 +152,7 @@ export const getFriendRequests =
     try {
       const params = { page, limit };
       if (filterName) params.name = filterName;
-      const response = await apiService.get("/friends/requests/incoming", {
+      const response = await apiService.get('/friends/requests/incoming', {
         params,
       });
       dispatch(slice.actions.getFriendRequestsSuccess(response.data));
@@ -151,7 +171,7 @@ export const sendFriendRequest = (targetUserId) => async (dispatch) => {
     dispatch(
       slice.actions.sendFriendRequestSuccess({ ...response.data, targetUserId })
     );
-    toast.success("Request sent");
+    toast.success('Request sent');
   } catch (error) {
     dispatch(slice.actions.hasError(error.message));
     toast.error(error.message);
@@ -162,12 +182,12 @@ export const declineRequest = (targetUserId) => async (dispatch) => {
   dispatch(slice.actions.startLoading());
   try {
     const response = await apiService.put(`/friends/requests/${targetUserId}`, {
-      status: "declined",
+      status: 'declined',
     });
     dispatch(
       slice.actions.declineRequestSuccess({ ...response.data, targetUserId })
     );
-    toast.success("Request declined");
+    toast.success('Request declined');
   } catch (error) {
     dispatch(slice.actions.hasError(error.message));
     toast.error(error.message);
@@ -178,12 +198,12 @@ export const acceptRequest = (targetUserId) => async (dispatch) => {
   dispatch(slice.actions.startLoading());
   try {
     const response = await apiService.put(`/friends/requests/${targetUserId}`, {
-      status: "accepted",
+      status: 'accepted',
     });
     dispatch(
       slice.actions.acceptRequestSuccess({ ...response.data, targetUserId })
     );
-    toast.success("Request accepted");
+    toast.success('Request accepted');
   } catch (error) {
     dispatch(slice.actions.hasError(error.message));
     toast.error(error.message);
@@ -191,17 +211,13 @@ export const acceptRequest = (targetUserId) => async (dispatch) => {
 };
 
 export const cancelRequest = (targetUserId) => async (dispatch) => {
-  dispatch(slice.actions.startLoading());
+  dispatch(startLoading());
   try {
-    const response = await apiService.delete(
-      `/friends/requests/${targetUserId}`
-    );
-    dispatch(
-      slice.actions.cancelRequestSuccess({ ...response.data, targetUserId })
-    );
-    toast.success("Request cancelled");
+    await apiService.delete(`/friends/requests/${targetUserId}`);
+    dispatch(cancelRequestSuccess({ targetUserId }));
+    toast.success('Request cancelled');
   } catch (error) {
-    dispatch(slice.actions.hasError(error.message));
+    dispatch(hasError(error.message));
     toast.error(error.message);
   }
 };
@@ -213,9 +229,24 @@ export const removeFriend = (targetUserId) => async (dispatch) => {
     dispatch(
       slice.actions.removeFriendSuccess({ ...response.data, targetUserId })
     );
-    toast.success("Friend removed");
+    toast.success('Friend removed');
   } catch (error) {
     dispatch(slice.actions.hasError(error.message));
     toast.error(error.message);
   }
 };
+
+export const getOutgoingRequests =
+  ({ page = 1 }) =>
+  async (dispatch) => {
+    dispatch(startLoading());
+    try {
+      const response = await apiService.get('/friends/requests/outgoing', {
+        params: { page },
+      });
+      dispatch(getOutgoingRequestsSuccess(response.data));
+    } catch (error) {
+      dispatch(hasError(error));
+      toast.error(error.message);
+    }
+  };

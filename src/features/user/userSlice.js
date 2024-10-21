@@ -1,17 +1,18 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { toast } from "react-toastify";
-import apiService from "../../app/apiService";
-import { cloudinaryUpload } from "../../utils/cloudinary";
+import { createSlice } from '@reduxjs/toolkit';
+import { toast } from 'react-toastify';
+import apiService from '../../app/apiService';
+import { cloudinaryUpload } from '../../utils/cloudinary';
 
 const initialState = {
   isLoading: false,
   error: null,
   updatedProfile: null,
   selectedUser: null,
+  currentUser: null,
 };
 
 const slice = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   reducers: {
     startLoading(state) {
@@ -28,6 +29,11 @@ const slice = createSlice({
       state.error = null;
 
       const updatedUser = action.payload;
+
+      if (state.currentUser && state.currentUser._id === updatedUser._id) {
+        state.currentUser = updatedUser;
+      }
+
       state.updatedProfile = updatedUser;
     },
 
@@ -36,6 +42,12 @@ const slice = createSlice({
       state.error = null;
 
       state.selectedUser = action.payload;
+    },
+    setCurrentUser(state, action) {
+      state.currentUser = action.payload;
+    },
+    clearCurrentUser(state) {
+      state.currentUser = null;
     },
   },
 });
@@ -80,7 +92,7 @@ export const updateUserProfile =
       }
       const response = await apiService.put(`/users/${userId}`, data);
       dispatch(slice.actions.updateUserProfileSuccess(response.data));
-      toast.success("Update Profile successfully");
+      toast.success('Update Profile successfully');
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
       toast.error(error.message);
@@ -101,9 +113,20 @@ export const getUser = (id) => async (dispatch) => {
 export const getCurrentUserProfile = () => async (dispatch) => {
   dispatch(slice.actions.startLoading());
   try {
-    const response = await apiService.get("/users/me");
+    const response = await apiService.get('/users/me');
     dispatch(slice.actions.updateUserProfileSuccess(response.data));
   } catch (error) {
     dispatch(slice.actions.hasError(error));
+  }
+};
+
+export const loginUser = (credentials) => async (dispatch) => {
+  try {
+    const response = await apiService.post('/auth/login', credentials);
+    dispatch(slice.actions.setCurrentUser(response.data.user));
+    toast.success('Login Successful!');
+  } catch (error) {
+    dispatch(slice.actions.hasError(error.message));
+    toast.error(error.message);
   }
 };

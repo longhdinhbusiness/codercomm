@@ -1,14 +1,16 @@
-import * as React from "react";
-import { Routes, Route } from "react-router-dom";
-import BlankLayout from "../layouts/BlankLayout";
-import MainLayout from "../layouts/MainLayout";
-import HomePage from "../pages/HomePage";
-import LoginPage from "../pages/LoginPage";
-import RegisterPage from "../pages/RegisterPage";
-import NotFoundPage from "../pages/NotFoundPage";
-import AuthRequire from "./AuthRequire";
-import AccountPage from "../pages/AccountPage";
-import UserProfilePage from "../pages/UserProfilePage";
+import * as React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import BlankLayout from '../layouts/BlankLayout';
+import MainLayout from '../layouts/MainLayout';
+import HomePage from '../pages/HomePage';
+import LoginPage from '../pages/LoginPage';
+import RegisterPage from '../pages/RegisterPage';
+import NotFoundPage from '../pages/NotFoundPage';
+import AuthRequire from './AuthRequire';
+import AccountPage from '../pages/AccountPage';
+import UserProfilePage from '../pages/UserProfilePage';
+import EditPostForm from '../features/post/EditPostForm';
+import OutgoingRequests from '../features/friend/OutgoingRequests';
 
 function Router() {
   return (
@@ -24,6 +26,8 @@ function Router() {
         <Route index element={<HomePage />} />
         <Route path="account" element={<AccountPage />} />
         <Route path="user/:userId" element={<UserProfilePage />} />
+        <Route path="edit-post/:id" element={<EditPostForm />} />
+        <Route path="outgoing-requests" element={<OutgoingRequests />} />
       </Route>
 
       <Route element={<BlankLayout />}>
