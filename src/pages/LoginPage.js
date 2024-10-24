@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Link,
   Stack,
@@ -6,27 +6,27 @@ import {
   IconButton,
   InputAdornment,
   Container,
-} from "@mui/material";
-import { LoadingButton } from "@mui/lab";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+} from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
-import { useNavigate, useLocation, Link as RouterLink } from "react-router-dom";
+import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 
-import { FCheckbox, FormProvider, FTextField } from "../components/form";
-import useAuth from "../hooks/useAuth";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
+import { FCheckbox, FormProvider, FTextField } from '../components/form';
+import useAuth from '../hooks/useAuth';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 
 const LoginSchema = Yup.object().shape({
-  email: Yup.string().email("Invalid email").required("Email is required"),
-  password: Yup.string().required("Password is required"),
+  email: Yup.string().email('Invalid email').required('Email is required'),
+  password: Yup.string().required('Password is required'),
 });
 
 const defaultValues = {
-  email: "",
-  password: "",
+  email: '',
+  password: '',
   remember: true,
 };
 
@@ -48,8 +48,8 @@ function LoginPage() {
   } = methods;
 
   const onSubmit = async (data) => {
-    const from = location.state?.from?.pathname || "/";
-    let { email, password } = data;
+    const from = location.state?.from?.pathname || '/';
+    const { email, password } = data;
 
     try {
       await auth.login({ email, password }, () => {
@@ -57,7 +57,7 @@ function LoginPage() {
       });
     } catch (error) {
       reset();
-      setError("responseError", error);
+      setError('responseError', error);
     }
   };
 
@@ -69,7 +69,7 @@ function LoginPage() {
             <Alert severity="error">{errors.responseError.message}</Alert>
           )}
           <Alert severity="info">
-            Don’t have an account?{" "}
+            Don’t have an account?{' '}
             <Link variant="subtitle2" component={RouterLink} to="/register">
               Get started
             </Link>
@@ -80,7 +80,7 @@ function LoginPage() {
           <FTextField
             name="password"
             label="Password"
-            type={showPassword ? "text" : "password"}
+            type={showPassword ? 'text' : 'password'}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">

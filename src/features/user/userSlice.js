@@ -43,9 +43,11 @@ const slice = createSlice({
 
       state.selectedUser = action.payload;
     },
+
     setCurrentUser(state, action) {
       state.currentUser = action.payload;
     },
+
     clearCurrentUser(state) {
       state.currentUser = null;
     },
@@ -53,6 +55,15 @@ const slice = createSlice({
 });
 
 export default slice.reducer;
+
+export const {
+  setCurrentUser,
+  clearCurrentUser,
+  startLoading,
+  hasError,
+  updateUserProfileSuccess,
+  getUserSuccess,
+} = slice.actions;
 
 export const updateUserProfile =
   ({
@@ -117,16 +128,5 @@ export const getCurrentUserProfile = () => async (dispatch) => {
     dispatch(slice.actions.updateUserProfileSuccess(response.data));
   } catch (error) {
     dispatch(slice.actions.hasError(error));
-  }
-};
-
-export const loginUser = (credentials) => async (dispatch) => {
-  try {
-    const response = await apiService.post('/auth/login', credentials);
-    dispatch(slice.actions.setCurrentUser(response.data.user));
-    toast.success('Login Successful!');
-  } catch (error) {
-    dispatch(slice.actions.hasError(error.message));
-    toast.error(error.message);
   }
 };

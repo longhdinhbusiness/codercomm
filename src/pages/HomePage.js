@@ -1,39 +1,41 @@
-import React, { useState } from "react";
-import useAuth from "../hooks/useAuth";
+import React, { useState } from 'react';
+import useAuth from '../hooks/useAuth';
 
-import { Box, Card, Container, Tab, Tabs } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import AccountBoxIcon from "@mui/icons-material/AccountBox";
-import ContactMailIcon from "@mui/icons-material/ContactMail";
-import PersonAddRoundedIcon from "@mui/icons-material/PersonAddRounded";
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import { Box, Card, Container, Tab, Tabs } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import ContactMailIcon from '@mui/icons-material/ContactMail';
+import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 
-import Profile from "../features/user/Profile";
-import ProfileCover from "../features/user/ProfileCover";
-import { capitalCase } from "change-case";
-import AddFriend from "../features/friend/AddFriend";
-import FriendRequests from "../features/friend/FriendRequests";
-import FriendList from "../features/friend/FriendList";
+import Profile from '../features/user/Profile';
+import ProfileCover from '../features/user/ProfileCover';
+import { capitalCase } from 'change-case';
+import AddFriend from '../features/friend/AddFriend';
+import FriendRequests from '../features/friend/FriendRequests';
+import FriendList from '../features/friend/FriendList';
+import OutgoingRequests from '../features/friend/OutgoingRequests';
 
-const TabsWrapperStyle = styled("div")(({ theme }) => ({
+const TabsWrapperStyle = styled('div')(({ theme }) => ({
   zIndex: 9,
   bottom: 0,
-  width: "100%",
-  display: "flex",
-  position: "absolute",
-  backgroundColor: "#fff",
-  [theme.breakpoints.up("sm")]: {
-    justifyContent: "center",
+  width: '100%',
+  display: 'flex',
+  position: 'absolute',
+  backgroundColor: '#fff',
+  [theme.breakpoints.up('sm')]: {
+    justifyContent: 'center',
   },
-  [theme.breakpoints.up("md")]: {
-    justifyContent: "flex-end",
+  [theme.breakpoints.up('md')]: {
+    justifyContent: 'flex-end',
     paddingRight: theme.spacing(3),
   },
 }));
 
 function HomePage() {
   const { user } = useAuth();
-  const [currentTab, setCurrentTab] = useState("profile");
+  const [currentTab, setCurrentTab] = useState('profile');
 
   const handleChangeTab = (newValue) => {
     setCurrentTab(newValue);
@@ -41,24 +43,29 @@ function HomePage() {
 
   const PROFILE_TABS = [
     {
-      value: "profile",
+      value: 'profile',
       icon: <AccountBoxIcon sx={{ fontSize: 24 }} />,
       component: <Profile profile={user} />,
     },
     {
-      value: "friends",
+      value: 'friends',
       icon: <PeopleAltIcon sx={{ fontSize: 24 }} />,
       component: <FriendList />,
     },
     {
-      value: "requests",
+      value: 'requests',
       icon: <ContactMailIcon sx={{ fontSize: 24 }} />,
       component: <FriendRequests />,
     },
     {
-      value: "add_friend",
+      value: 'add_friend',
       icon: <PersonAddRoundedIcon sx={{ fontSize: 24 }} />,
       component: <AddFriend />,
+    },
+    {
+      value: 'outgoing_requests',
+      icon: <GroupAddIcon sx={{ fontSize: 24 }} />,
+      component: <OutgoingRequests />,
     },
   ];
 
@@ -68,7 +75,7 @@ function HomePage() {
         sx={{
           mb: 3,
           height: 280,
-          position: "relative",
+          position: 'relative',
         }}
       >
         <ProfileCover profile={user} />

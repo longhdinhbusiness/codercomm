@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Box,
   Link,
@@ -12,20 +12,22 @@ import {
 import { Link as RouterLink } from 'react-router-dom';
 import { fDate } from '../../utils/formatTime';
 
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PostReaction from './PostReaction';
 import CommentForm from '../comment/CommentForm';
 import CommentList from '../comment/CommentList';
 
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { deletePost } from './postSlice';
 import EditIcon from '@mui/icons-material/Edit';
+import { AuthContext } from '../../contexts/AuthContext';
 
 function PostCard({ post }) {
   const dispatch = useDispatch();
-  const currentUser = useSelector((state) => state.user.currentUser);
-
+  // const currentUser = useSelector((state) => state.user.currentUser);
+  const { user } = useContext(AuthContext);
+  const currentUser = user;
+  console.log(currentUser);
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       dispatch(deletePost(post._id));
@@ -73,9 +75,6 @@ function PostCard({ post }) {
                 </IconButton>
               </>
             )}
-            <IconButton>
-              <MoreVertIcon sx={{ fontSize: 30 }} />
-            </IconButton>
           </>
         }
       />

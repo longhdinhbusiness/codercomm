@@ -8,6 +8,8 @@ import * as Yup from 'yup';
 import { updatePost, getPost } from './postSlice';
 import { LoadingButton } from '@mui/lab';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { cloudinaryUpload } from '../../utils/cloudinary';
 
 const yupSchema = Yup.object().shape({
   content: Yup.string().required('Content is required'),
@@ -23,6 +25,7 @@ function EditPostForm() {
   const dispatch = useDispatch();
   const { id } = useParams();
   const { post, isLoading } = useSelector((state) => state.post);
+  const navigate = useNavigate();
 
   const methods = useForm({
     resolver: yupResolver(yupSchema),
@@ -41,10 +44,19 @@ function EditPostForm() {
     }
   }, [post, reset]);
 
-  const onSubmit = (data) => {
-    if (data.image instanceof File) {
+  const onSubmit = async (data) => {
+    try {
+      let updatedData = { ...data };
+
+      if (data.image instanceof File) {
+        const imageUrl = await cloudinaryUpload(data.image);
+        updatedData = { ...updatedData, image: imageUrl };
+      }
+      dispatch(updatePost({ id, ...updatedData }));
+      navigate(-1);
+    } catch (error) {
+      console.error('Failed to update post:', error);
     }
-    dispatch(updatePost({ id, ...data }));
   };
 
   return (

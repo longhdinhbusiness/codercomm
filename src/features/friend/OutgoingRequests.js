@@ -7,12 +7,10 @@ import {
   Pagination,
   Grid,
   Container,
-  Button,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { getOutgoingRequests } from './friendSlice';
 import UserCard from './UserCard';
-import { cancelRequest } from './friendSlice';
 
 function OutgoingRequests() {
   const [page, setPage] = useState(1);
@@ -49,13 +47,6 @@ function OutgoingRequests() {
             {users.map((user) => (
               <Grid key={user._id} item xs={12} md={4}>
                 <UserCard profile={user} />
-                <Button
-                  onClick={() => dispatch(cancelRequest(user._id))}
-                  color="error"
-                  variant="contained"
-                >
-                  Cancel Request
-                </Button>
               </Grid>
             ))}
           </Grid>
